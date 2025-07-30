@@ -1,15 +1,133 @@
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
 
+// Import mock phones data
+const mockPhones = [
+  {
+    id: '1',
+    name: 'iPhone 16 Pro',
+    company: 'apple',
+    rating: 4.4,
+    price: 134900,
+    colors: ['black', 'white', 'blue'],
+    availability: {
+      black: true,
+      white: true,
+      blue: false
+    },
+    variants: ['128GB', '256GB', '512GB'],
+    specifications: ['6.1" ProMotion Display', 'A17 Pro Chip', '48MP Triple Camera'],
+    image: 'https://m.media-amazon.com/images/I/31XFFW-tHNL._SY445_SX342_QL70_FMwebp_.jpg',
+    foundAt: 'Apple Store, Delhi'
+  },
+  {
+    id: '2',
+    name: 'Galaxy S24 Ultra',
+    company: 'samsung',
+    rating: 4.7,
+    price: 129999,
+    colors: ['titanium', 'black', 'silver'],
+    availability: {
+      titanium: true,
+      black: true,
+      silver: false
+    },
+    variants: ['256GB', '512GB'],
+    specifications: ['6.8" AMOLED', 'Snapdragon 8 Gen 3', '200MP Camera'],
+    image: 'https://m.media-amazon.com/images/I/41X9qNxoJKL._SX300_SY300_QL70_FMwebp_.jpg',
+    foundAt: 'Samsung Store, Mumbai'
+  },
+  {
+    id: '3',
+    name: 'OnePlus 12',
+    company: 'oneplus',
+    rating: 4.5,
+    price: 64999,
+    colors: ['green', 'black'],
+    availability: {
+      green: true,
+      black: true
+    },
+    variants: ['128GB', '256GB'],
+    specifications: ['6.82" AMOLED', 'Snapdragon 8 Gen 3', '50MP Triple Camera'],
+    image: 'https://m.media-amazon.com/images/I/41J4+TiUz6L._SY300_SX300_.jpg',
+    foundAt: 'Croma, Bangalore'
+  },
+  {
+    id: '4',
+    name: 'Xiaomi 14 Ultra',
+    company: 'xiaomi',
+    rating: 4.6,
+    price: 99999,
+    colors: ['white', 'black'],
+    availability: {
+      white: true,
+      black: false
+    },
+    variants: ['256GB', '512GB'],
+    specifications: ['6.73" LTPO AMOLED', 'Snapdragon 8 Gen 3', 'Leica Camera'],
+    image: 'https://m.media-amazon.com/images/I/41r6mLsKMbL._SX300_SY300_QL70_FMwebp_.jpg',
+    foundAt: 'Mi Home, Pune'
+  },
+  {
+    id: '5',
+    name: 'Realme GT 6',
+    company: 'realme',
+    rating: 4.3,
+    price: 36999,
+    colors: ['silver', 'blue'],
+    availability: {
+      silver: true,
+      blue: true
+    },
+    variants: ['128GB', '256GB'],
+    specifications: ['6.7" AMOLED', 'Snapdragon 8s Gen 3', 'AI Camera'],
+    image: 'https://m.media-amazon.com/images/I/41ofU8c2xOL._SX300_SY300_QL70_FMwebp_.jpg',
+    foundAt: 'Realme Store, Hyderabad'
+  },
+  {
+    id: '6',
+    name: 'Vivo X100 Pro',
+    company: 'vivo',
+    rating: 4.4,
+    price: 89999,
+    colors: ['black', 'red'],
+    availability: {
+      black: true,
+      red: true
+    },
+    variants: ['256GB'],
+    specifications: ['6.78" AMOLED', 'Dimensity 9300', 'ZEISS Lens'],
+    image: 'https://m.media-amazon.com/images/I/71mwKuVAMmL._AC_UY327_FMwebp_QL65_.jpg',
+    foundAt: 'Vivo Store, Chandigarh'
+  },
+  {
+    id: '7',
+    name: 'Oppo Find X7',
+    company: 'oppo',
+    rating: 4.2,
+    price: 84999,
+    colors: ['gold', 'blue'],
+    availability: {
+      gold: true,
+      blue: false
+    },
+    variants: ['512GB'],
+    specifications: ['LTPO AMOLED', 'Snapdragon 8 Gen 2', 'Periscope Camera'],
+    image: 'https://m.media-amazon.com/images/I/71WNcgI8H7L._AC_UY327_FMwebp_QL65_.jpg',
+    foundAt: 'Oppo Gallery, Jaipur'
+  }
+];
+
 export class ChatbotService {
   constructor() {
     this.conversationState = {
-      step: 'idle',
+      step: 'greeting',
       userPreferences: {}
     };
   }
 
   getGreeting() {
-    return "Namaste! Main Cub hun. Main aapki phone dhundne mein madad kar sakta hun. Aap kis company ka phone chahte hain?";
+    return "mera naam cub hai, mujhe aapki sahayta ke liye banaya gaya hai, aapko konsi company ka phone chahiye?";
   }
 
   processUserInput(input) {
@@ -18,13 +136,14 @@ export class ChatbotService {
     switch (this.conversationState.step) {
       case 'greeting':
         return this.handleCompanyQuery(lowercaseInput);
-      case 'company':
-        return this.handlePriceQuery(lowercaseInput);
-      case 'price':
-        return this.handleColorQuery(lowercaseInput);
+      case 'budget':
+        return this.handleBudgetQuery(lowercaseInput);
       case 'color':
-        this.conversationState.step = 'results';
-        return "Bahut accha! Main aapke liye phone dhundh raha hun...";
+        return this.handleColorQuery(lowercaseInput);
+      case 'availability':
+        return this.handleAvailabilityQuery(lowercaseInput);
+      case 'specification':
+        return this.handleSpecificationQuery(lowercaseInput);
       default:
         this.conversationState.step = 'greeting';
         return this.getGreeting();
@@ -32,138 +151,153 @@ export class ChatbotService {
   }
 
   handleCompanyQuery(input) {
-    const companies = ['samsung', 'apple', 'xiaomi', 'oneplus', 'realme', 'oppo', 'vivo'];
-    const foundCompany = companies.find(company => input.includes(company));
+    const companies = ['samsung', 'apple', 'xiaomi', 'oneplus', 'realme', 'oppo', 'vivo', 'nothing', 'motorola', 'google', 'infinix', 'poco', 'lava'];
+    const foundCompany = companies.find(company => 
+      input.includes(company) || 
+      input.includes('सैमसंग') && company === 'samsung' ||
+      input.includes('एप्पल') && company === 'apple' ||
+      input.includes('शाओमी') && company === 'xiaomi' ||
+      input.includes('वनप्लस') && company === 'oneplus' ||
+      input.includes('रियलमी') && company === 'realme' ||
+      input.includes('ओप्पो') && company === 'oppo' ||
+      input.includes('विवो') && company === 'vivo'
+    );
     
     if (foundCompany) {
       this.conversationState.userPreferences.company = foundCompany;
-      this.conversationState.step = 'price';
-      const companyName = foundCompany.charAt(0).toUpperCase() + foundCompany.slice(1);
-      return `${companyName} acchi pasand hai! Aapka budget kya hai? Kam, madhyam ya zyada?`;
+      this.conversationState.step = 'budget';
+      return `${foundCompany} accha! ab aapka budget kya hai? rupay mein bataiye.`;
     }
     
-    return "Kripaya koi phone company bataiye jaise Samsung, Apple, Xiaomi aadi.";
+    return "kripaya company name bataiye jaise samsung, apple, xiaomi.";
   }
 
-  handlePriceQuery(input) {
-    let priceRange = '';
-    if (input.includes('kam') || input.includes('low') || input.includes('cheap')) {
-      priceRange = 'low';
-    } else if (input.includes('madhyam') || input.includes('medium') || input.includes('mid')) {
-      priceRange = 'medium';
-    } else if (input.includes('zyada') || input.includes('high') || input.includes('expensive')) {
-      priceRange = 'high';
-    }
-
-    if (priceRange) {
-      this.conversationState.userPreferences.priceRange = priceRange;
+  handleBudgetQuery(input) {
+    // Extract numbers from input
+    const budgetMatch = input.match(/(\d+)/);
+    if (budgetMatch) {
+      const budget = parseInt(budgetMatch[1]);
+      this.conversationState.userPreferences.budget = budget;
       this.conversationState.step = 'color';
-      return "Badhiya! Aap kaun sa rang pasand karenge?";
+      return "badhiya! aap kaun sa rang pasand karenge?";
     }
-
-    return "Kripaya apna budget bataiye - kam, madhyam ya zyada.";
+    
+    return "kripaya budget rupay mein bataiye.";
   }
 
   handleColorQuery(input) {
-    const colors = ['black', 'white', 'blue', 'red', 'gold', 'silver'];
-    const foundColor = colors.find(color => 
-      input.includes(color) || 
-      input.includes(this.translateColor(color))
-    );
+    const colorMap = {
+      'black': ['black', 'kala', 'काला'],
+      'white': ['white', 'safed', 'सफेद'],
+      'blue': ['blue', 'nila', 'नीला'],
+      'red': ['red', 'lal', 'लाल'],
+      'gold': ['gold', 'sunehra', 'सुनहरा'],
+      'silver': ['silver', 'chandi', 'चांदी'],
+      'green': ['green', 'hara', 'हरा'],
+      'titanium': ['titanium', 'टाइटेनियम'],
+      'violet': ['violet', 'baingani', 'बैंगनी'],
+      'purple': ['purple', 'jamuni', 'जामुनी'],
+      'yellow': ['yellow', 'pila', 'पीला']
+    };
+
+    let foundColor = null;
+    for (const [color, variations] of Object.entries(colorMap)) {
+      if (variations.some(variant => input.includes(variant))) {
+        foundColor = color;
+        break;
+      }
+    }
 
     if (foundColor) {
       this.conversationState.userPreferences.color = foundColor;
-      return "Perfect! Main aapke liye phone dhundh raha hun...";
+      this.conversationState.step = 'availability';
+      return "kya aap chahte hain ki phone available ho?";
     }
 
-    return "Kripaya koi rang bataiye jaise kala, safed, nila aadi.";
+    return "kripaya rang bataiye jaise kala, safed, nila.";
   }
 
-  translateColor(color) {
-    const colorMap = {
-      'black': 'kala',
-      'white': 'safed',
-      'blue': 'nila',
-      'red': 'lal',
-      'gold': 'sunehra',
-      'silver': 'chandi'
-    };
-    return colorMap[color] || color;
+  handleAvailabilityQuery(input) {
+    const wantsAvailable = input.includes('han') || input.includes('yes') || input.includes('हां') || input.includes('जी');
+    this.conversationState.userPreferences.needsAvailability = wantsAvailable;
+    this.conversationState.step = 'specification';
+    return "koi khaas specification chahiye?";
+  }
+
+  handleSpecificationQuery(input) {
+    if (input.includes('nahi') || input.includes('no') || input.includes('नहीं')) {
+      this.conversationState.step = 'results';
+      return "perfect! main aapke liye phone dhundh raha hun...";
+    }
+    
+    this.conversationState.userPreferences.specification = input;
+    this.conversationState.step = 'results';
+    return "perfect! main aapke liye phone dhundh raha hun...";
   }
 
   async searchProducts() {
     try {
-      const response = await fetch(`${API_BASE_URL}/search-phones`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          preferences: this.conversationState.userPreferences
-        })
+      // Filter phones based on user preferences
+      const filtered = mockPhones.filter(phone => {
+        // Company match
+        if (this.conversationState.userPreferences.company && 
+            phone.company !== this.conversationState.userPreferences.company) {
+          return false;
+        }
+        
+        // Budget match (within 20% range)
+        if (this.conversationState.userPreferences.budget) {
+          const budget = this.conversationState.userPreferences.budget;
+          const budgetRange = budget * 0.3; // 30% range
+          if (phone.price < budget - budgetRange || phone.price > budget + budgetRange) {
+            return false;
+          }
+        }
+        
+        // Color match
+        if (this.conversationState.userPreferences.color && 
+            !phone.colors.includes(this.conversationState.userPreferences.color)) {
+          return false;
+        }
+        
+        // Availability match
+        if (this.conversationState.userPreferences.needsAvailability && 
+            this.conversationState.userPreferences.color) {
+          if (!phone.availability[this.conversationState.userPreferences.color]) {
+            return false;
+          }
+        }
+        
+        // Specification match (basic keyword matching)
+        if (this.conversationState.userPreferences.specification) {
+          const spec = this.conversationState.userPreferences.specification.toLowerCase();
+          const phoneSpecs = phone.specifications.join(' ').toLowerCase();
+          if (!phoneSpecs.includes('camera') && spec.includes('camera')) return false;
+          if (!phoneSpecs.includes('display') && spec.includes('display')) return false;
+        }
+        
+        return true;
       });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      return data.products || [];
+
+      return filtered;
     } catch (error) {
       console.error('Error searching products:', error);
-      return this.getMockProducts();
+      return [];
     }
-  }
-
-  getMockProducts() {
-    return [
-      {
-        id: '1',
-        name: 'iPhone 15 Pro',
-        company: 'apple',
-        price: 134900,
-        color: 'black',
-        image: 'https://images.pexels.com/photos/788946/pexels-photo-788946.jpeg',
-        specifications: ['256GB Storage', '6.1" ProMotion Display', 'A17 Pro Chip', '48MP Camera']
-      },
-      {
-        id: '2',
-        name: 'Galaxy S24 Ultra',
-        company: 'samsung',
-        price: 129999,
-        color: 'titanium',
-        image: 'https://images.pexels.com/photos/1092644/pexels-photo-1092644.jpeg',
-        specifications: ['512GB Storage', '6.8" Dynamic AMOLED', 'Snapdragon 8 Gen 3', '200MP Camera']
-      },
-      {
-        id: '3',
-        name: 'OnePlus 12',
-        company: 'oneplus',
-        price: 64999,
-        color: 'green',
-        image: 'https://images.pexels.com/photos/699122/pexels-photo-699122.jpeg',
-        specifications: ['256GB Storage', '6.82" LTPO AMOLED', 'Snapdragon 8 Gen 3', '50MP Camera']
-      },
-      {
-        id: '4',
-        name: 'Xiaomi 14 Ultra',
-        company: 'xiaomi',
-        price: 99999,
-        color: 'white',
-        image: 'https://images.pexels.com/photos/1440727/pexels-photo-1440727.jpeg',
-        specifications: ['512GB Storage', '6.73" LTPO AMOLED', 'Snapdragon 8 Gen 3', 'Leica Camera']
-      }
-    ];
   }
 
   resetConversation() {
     this.conversationState = {
-      step: 'idle',
+      step: 'greeting',
       userPreferences: {}
     };
   }
 
   getCurrentStep() {
     return this.conversationState.step;
+  }
+
+  getUserPreferences() {
+    return this.conversationState.userPreferences;
   }
 }

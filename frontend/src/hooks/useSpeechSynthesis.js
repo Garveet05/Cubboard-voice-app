@@ -2,36 +2,59 @@ import { useState, useEffect } from 'react';
 
 // Translation map from Roman Hindi to Devanagari Hindi
 const romanToHindiMap = {
-  'Namaste! Main Cub hun. Main aapki phone dhundne mein madad kar sakta hun. Aap kis company ka phone chahte hain?': 'नमस्ते! मैं कब हूं। मैं आपकी फोन ढूंढने में मदद कर सकता हूं। आप किस कंपनी का फोन चाहते हैं?',
-  'acchi pasand hai! Aapka budget kya hai? Kam, madhyam ya zyada?': 'अच्छी पसंद है! आपका बजट क्या है? कम, मध्यम या ज्यादा?',
-  'Badhiya! Aap kaun sa rang pasand karenge?': 'बढ़िया! आप कौन सा रंग पसंद करेंगे?',
-  'Perfect! Main aapke liye phone dhundh raha hun...': 'परफेक्ट! मैं आपके लिए फोन ढूंढ रहा हूं...',
-  'Bahut accha! Main aapke liye phone dhundh raha hun...': 'बहुत अच्छा! मैं आपके लिए फोन ढूंढ रहा हूं...',
-  'Kripaya koi phone company bataiye jaise Samsung, Apple, Xiaomi aadi.': 'कृपया कोई फोन कंपनी बताइए जैसे सैमसंग, एप्पल, शाओमी आदि।',
-  'Kripaya apna budget bataiye - kam, madhyam ya zyada.': 'कृपया अपना बजट बताइए - कम, मध्यम या ज्यादा।',
-  'Kripaya koi rang bataiye jaise kala, safed, nila aadi.': 'कृपया कोई रंग बताइए जैसे काला, सफेद, नीला आदि।',
-  'Yahan aapke liye kuch behtareen phones hain.': 'यहां आपके लिए कुछ बेहतरीन फोन हैं।'
+  'mera naam cub hai, mujhe aapki sahayta ke liye banaya gaya hai, aapko konsi company ka phone chahiye?': ' मेरा नाम कब है, मुझे आपकी सहायता के लिए बनाया गया है, आपको कौनसी कंपनी का फोन चाहिए?',
+  'accha! ab aapka budget kya hai? rupay mein bataiye.': 'अच्छा! अब आपका बजट क्या है? रुपये में बताइए।',
+  'badhiya! aap kaun sa rang pasand karenge?': 'बढ़िया! आप कौन सा रंग पसंद करेंगे?',
+  'kya aap chahte hain ki phone available ho?': 'क्या आप चाहते हैं कि फोन उपलब्ध हो?',
+  'koi khaas specification chahiye?': 'कोई खास स्पेसिफिकेशन चाहिए?',
+  'perfect! main aapke liye phone dhundh raha hun...': 'परफेक्ट! मैं आपके लिए फोन ढूंढ रहा हूं...',
+  'maaf kijiye, aapki requirement ke anusar koi phone nahi mila.': 'माफ़ कीजिए, आपकी आवश्यकता के अनुसार कोई फोन नहीं मिला।',
+  'yahan aapke liye kuch behtareen phones hain.': 'यहां आपके लिए कुछ बेहतरीन फोन हैं।',
+  'kripaya company name bataiye jaise samsung, apple, xiaomi.': 'कृपया कंपनी नाम बताइए जैसे सैमसंग, एप्पल, शाओमी।',
+  'kripaya budget rupay mein bataiye.': 'कृपया बजट रुपये में बताइए।',
+  'kripaya rang bataiye jaise kala, safed, nila.': 'कृपया रंग बताइए जैसे काला, सफेद, नीला।',
+  'han ya nahi mein jawab dijiye.': 'हां या नहीं में जवाब दीजिए।',
+  'koi specification bataiye.': 'कोई स्पेसिफिकेशन बताइए।'
+};
+
+// Company name translations
+const companyTranslations = {
+  'apple': 'एप्पल',
+  'samsung': 'सैमसंग', 
+  'xiaomi': 'शाओमी',
+  'oneplus': 'वनप्लस',
+  'realme': 'रियलमी',
+  'oppo': 'ओप्पो',
+  'vivo': 'विवो',
+  'nothing': 'नथिंग',
+  'motorola': 'मोटोरोला',
+  'google': 'गूगल',
+  'infinix': 'इन्फिनिक्स',
+  'poco': 'पोको',
+  'lava': 'लावा'
 };
 
 // Function to translate Roman Hindi to Devanagari Hindi
 const translateToHindi = (romanText) => {
   // Check for exact matches first
-  if (romanToHindiMap[romanText]) {
-    return romanToHindiMap[romanText];
+  if (romanToHindiMap[romanText.toLowerCase()]) {
+    return romanToHindiMap[romanText.toLowerCase()];
+  }
+  
+  // Handle dynamic company responses
+  const companyMatch = romanText.match(/(\w+) accha!/);
+  if (companyMatch) {
+    const company = companyMatch[1].toLowerCase();
+    const hindiCompany = companyTranslations[company] || company;
+    return `${hindiCompany} अच्छा! अब आपका बजट क्या है? रुपये में बताइए।`;
   }
   
   // Check for partial matches (for dynamic company names)
   for (const [roman, hindi] of Object.entries(romanToHindiMap)) {
-    if (romanText.includes('acchi pasand hai!') && roman.includes('acchi pasand hai!')) {
-      return romanText.replace(/(\w+) acchi pasand hai!/, (match, company) => {
-        const companyInHindi = company === 'samsung' ? 'सैमसंग' : 
-                              company === 'apple' ? 'एप्पल' : 
-                              company === 'xiaomi' ? 'शाओमी' : 
-                              company === 'oneplus' ? 'वनप्लस' : 
-                              company === 'realme' ? 'रियलमी' : 
-                              company === 'oppo' ? 'ओप्पो' : 
-                              company === 'vivo' ? 'विवो' : company;
-        return `${companyInHindi} अच्छी पसंद है! आपका बजट क्या है? कम, मध्यम या ज्यादा?`;
+    if (romanText.includes('accha!') && roman.includes('accha!')) {
+      return romanText.replace(/(\w+) accha!/, (match, company) => {
+        const companyInHindi = companyTranslations[company.toLowerCase()] || company;
+        return `${companyInHindi} अच्छा! अब आपका बजट क्या है? रुपये में बताइए।`;
       });
     }
   }
