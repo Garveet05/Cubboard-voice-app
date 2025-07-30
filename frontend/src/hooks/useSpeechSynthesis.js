@@ -5,7 +5,7 @@ const romanToHindiMap = {
   'mera naam cub hai, mujhe aapki sahayta ke liye banaya gaya hai, aapko konsi company ka phone chahiye?': ' मेरा नाम कब है, मुझे आपकी सहायता के लिए बनाया गया है, आपको कौनसी कंपनी का फोन चाहिए?',
   'accha! ab aapka budget kya hai? rupay mein bataiye.': 'अच्छा! अब आपका बजट क्या है? रुपये में बताइए।',
   'badhiya! aap kaun sa rang pasand karenge?': 'बढ़िया! आप कौन सा रंग पसंद करेंगे?',
-  'kya aap chahte hain ki phone available ho?': 'क्या आप चाहते हैं कि फोन उपलब्ध हो?',
+  'kya aap chahte ho ki phone abhi available ho?': 'क्या आप चाहते हैं कि फोन अब उपलब्ध हो?',
   'koi khaas specification chahiye?': 'कोई खास स्पेसिफिकेशन चाहिए?',
   'perfect! main aapke liye phone dhundh raha hun...': 'परफेक्ट! मैं आपके लिए फोन ढूंढ रहा हूं...',
   'maaf kijiye, aapki requirement ke anusar koi phone nahi mila.': 'माफ़ कीजिए, आपकी आवश्यकता के अनुसार कोई फोन नहीं मिला।',
