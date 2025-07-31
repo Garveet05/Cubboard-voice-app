@@ -328,7 +328,6 @@ export class ChatbotService {
   handleDirectPhoneQuery(phoneName) {
     const phone = mockPhones.find(p => p.name === phoneName);
     if (phone) {
-      
       this.conversationState.step = 'direct_result';
       const message = `${phone.name} mil gaya! Price: ₹${phone.price.toLocaleString()}, Rating: ${phone.rating} out of 5, Available colors: ${phone.colors.join(', ')},Available at: ${phone.foundAt} .Thankyou`;
       this.speak(message);

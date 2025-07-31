@@ -11,13 +11,13 @@ const ProductGrid = ({ products, onProductSelect, onRestart, onEnd, language = '
 
   const texts = {
     hindi: {
-      bestPhoneTitle: "आपके लिए सबसे अच्छे फोन",
-      bestPhoneSubtitle: "हमारे AI असिस्टेंट द्वारा सुझाए गए",
-      noPhoneFound: "कोई फोन नहीं मिला",
-      noPhoneMessage: "आपकी आवश्यकताओं के अनुसार कोई फोन उपलब्ध नहीं है।",
-      endConversation: "बातचीत समाप्त करें",
-      backToChat: "चैट पर वापस जाएं",
-      selectPhone: "यह फोन चुनें"
+    bestPhoneTitle: "Aapke liye sabse acche phone",
+    bestPhoneSubtitle: "Hamaare AI Assistant dwara sujhaaye gaye",
+    noPhoneFound: "Koi phone nahi mila",
+    noPhoneMessage: "Aapki aavashyaktaon ke anuroop koi phone upalabdh nahi hai.",
+    endConversation: "End Conversation",
+    backToChat: "Back to Chat",
+    selectPhone: "Select This Phone"
     },
     english: {
       bestPhoneTitle: "Best Phones for You",
