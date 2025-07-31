@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Mic, Square, MessageCircle, Phone, Sparkles, Send } from 'lucide-react';
 import CubDisplay from './CubDisplay';
 import ProductGrid from './ProductGrid';
+import PhoneComparison from './PhoneComparison';
 import { useSpeechRecognition } from '../hooks/useSpeechRecognition';
 import { useSpeechSynthesis } from '../hooks/useSpeechSynthesis';
 import { ChatbotService } from '../services/chatbotService';
@@ -12,6 +13,7 @@ const VoiceChatInterface = () => {
   const [messages, setMessages] = useState([]);
   const [products, setProducts] = useState([]);
   const [showProducts, setShowProducts] = useState(false);
+  const [showComparison, setShowComparison] = useState(false);
   const [initialGreetingDone, setInitialGreetingDone] = useState(false);
   const [manualInput, setManualInput] = useState('');
   const [showPhoneButton, setShowPhoneButton] = useState(false);
@@ -98,6 +100,7 @@ const VoiceChatInterface = () => {
 
   const handleShowPhones = () => {
     setShowProducts(true);
+    setShowComparison(false);
     setShowPhoneButton(false);
     
     if (products.length > 0) {
@@ -105,6 +108,21 @@ const VoiceChatInterface = () => {
         speak('yahan aapke liye kuch behtareen phones hain.');
       }, 500);
     }
+  };
+
+  const handleShowComparison = () => {
+    setShowComparison(true);
+    setShowProducts(false);
+    setShowPhoneButton(false);
+    
+    setTimeout(() => {
+      speak('aap yahan do phones ko compare kar sakte hain.');
+    }, 500);
+  };
+
+  const handleBackToResults = () => {
+    setShowProducts(true);
+    setShowComparison(false);
   };
 
   const handleManualSubmit = (e) => {
@@ -119,6 +137,7 @@ const VoiceChatInterface = () => {
     if (!isActive) {
       setIsActive(true);
       setShowProducts(false);
+      setShowComparison(false);
       setShowPhoneButton(false);
       chatbot.resetConversation();
       setMessages([]);
@@ -143,6 +162,7 @@ const VoiceChatInterface = () => {
     stopListening();
     stopSpeaking();
     setShowProducts(false);
+    setShowComparison(false);
     setShowPhoneButton(false);
     chatbot.resetConversation();
     setMessages([]);
@@ -151,11 +171,12 @@ const VoiceChatInterface = () => {
   };
   
   const handleRestartConversation = () => {
-    setShowProducts(false); // Hide product grid to show chat
+    setShowProducts(false);
+    setShowComparison(false);
     setShowPhoneButton(false);
     chatbot.resetConversation();
     setProducts([]);
-    setMessages([]); // Clear old messages
+    setMessages([]);
 
     // Start a new conversation from the beginning
     const greeting = chatbot.getGreeting();
@@ -167,7 +188,7 @@ const VoiceChatInterface = () => {
     };
     setMessages([greetingMsg]);
     speak(greeting);
-    setIsActive(true); // Ensure the chat view is active
+    setIsActive(true);
   };
 
   const renderTalkButton = () => {
@@ -227,6 +248,25 @@ const VoiceChatInterface = () => {
     );
   }
 
+  // Show comparison view
+  if (showComparison) {
+    return (
+      <>
+        <PhoneComparison
+          phones={products}
+          onBack={handleBackToResults}
+          onEnd={handleStopConversation}
+        />
+        <CubDisplay
+          isInteracting={isSpeaking}
+          isSpeaking={isSpeaking}
+          isListening={isListening}
+          showCompact={true}
+        />
+      </>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900 relative overflow-hidden">
       {/* Blurred background shapes */}
@@ -244,6 +284,7 @@ const VoiceChatInterface = () => {
               products={products}
               onRestart={handleRestartConversation}
               onEnd={handleStopConversation}
+              onCompare={handleShowComparison}
             />
           </div>
           <CubDisplay
@@ -306,16 +347,26 @@ const VoiceChatInterface = () => {
                 ))}
               </div>
 
-              {/* Show Phone Button */}
+              {/* Show Phone and Comparison Buttons */}
               {showPhoneButton && products.length > 0 && (
-                <div className="flex justify-center my-4">
+                <div className="flex justify-center space-x-4 my-4">
                   <button
                     onClick={handleShowPhones}
-                    className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-8 py-3 rounded-2xl font-bold transition-all duration-300 transform hover:scale-105 shadow-lg shadow-green-500/25 flex items-center space-x-2"
+                    className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white px-6 py-3 rounded-2xl font-bold transition-all duration-300 transform hover:scale-105 shadow-lg shadow-green-500/25 flex items-center space-x-2"
                   >
                     <span>📱</span>
-                    <span>Matched Result ({products.length})</span>
+                    <span>View Results ({products.length})</span>
                   </button>
+                  
+                  {products.length >= 2 && (
+                    <button
+                      onClick={handleShowComparison}
+                      className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white px-6 py-3 rounded-2xl font-bold transition-all duration-300 transform hover:scale-105 shadow-lg shadow-blue-500/25 flex items-center space-x-2"
+                    >
+                      <span>⚖️</span>
+                      <span>Compare Phones</span>
+                    </button>
+                  )}
                 </div>
               )}
 

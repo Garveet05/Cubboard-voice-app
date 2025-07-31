@@ -1,4 +1,5 @@
 import React from "react";
+import { MapPin } from "lucide-react";
 
 const ProductGrid = ({ products, onProductSelect, onRestart, onEnd, language = 'hindi' }) => {
   const formatPrice = (price) => {
@@ -114,6 +115,12 @@ const ProductGrid = ({ products, onProductSelect, onRestart, onEnd, language = '
                 <p className="text-gray-400 text-sm mb-4 line-clamp-2">
                   {product.description}
                 </p>
+              )}
+              {product.foundAt && (
+                <div className="flex items-center text-sm text-gray-400 mb-4">
+                  <MapPin className="w-4 h-4 mr-2" />
+                  <span>{product.foundAt}</span>
+                </div>
               )}
 
               <div className="space-y-2 mb-4">

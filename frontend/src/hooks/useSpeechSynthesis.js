@@ -14,7 +14,8 @@ const romanToHindiMap = {
   'kripaya budget rupay mein bataiye.': 'कृपया बजट रुपये में बताइए।',
   'kripaya rang bataiye jaise kala, safed, nila.': 'कृपया रंग बताइए जैसे काला, सफेद, नीला।',
   'han ya nahi mein jawab dijiye.': 'हां या नहीं में जवाब दीजिए।',
-  'koi specification bataiye.': 'कोई स्पेसिफिकेशन बताइए।'
+  'koi specification bataiye.': 'कोई स्पेसिफिकेशन बताइए।',
+  'aap yahan do phones ko compare kar sakte hain.':'आप यहाँ दो फोन की तुलना कर सकते हैं|'
 };
 
 // Company name translations
